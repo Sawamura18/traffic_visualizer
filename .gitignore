@@ -1,0 +1,43 @@
+# --- Python cache ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# --- Virtual environment ---
+venv/
+.env/
+env/
+.venv/
+
+# --- OS-specific junk ---
+.DS_Store
+Thumbs.db
+
+# --- IDE / editor junk ---
+.vscode/
+.idea/
+*.swp
+
+# --- Data & large files ---
+data/
+uploads/
+latest_upload.txt
+
+# --- Generated output ---
+static/*.csv
+static/*.html
+static/scatter_plots/
+static/results_detailed.csv
+static/macrodata.csv
+
+# --- Logs & temporary files ---
+*.log
+*.tmp
+*.bak
+*.sqlite3
+
+# --- Flask specific cache ---
+instance/
+*.db
