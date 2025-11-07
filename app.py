@@ -63,7 +63,6 @@ def upload_file():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
 
-        # Save uploaded file path in a temp file for reuse
         with open("latest_upload.txt", "w") as f:
             f.write(filepath)
 
