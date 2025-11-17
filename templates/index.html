@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Traffic Data Visualizer</title>
     <style>
         body {
@@ -11,6 +12,7 @@
             margin: 0;
             padding: 0;
         }
+
         header {
             background-color: #007bff;
             color: white;
@@ -18,6 +20,7 @@
             text-align: center;
             font-size: 1.8em;
         }
+
         .container {
             width: 90%;
             margin: 30px auto;
@@ -26,13 +29,47 @@
             padding: 25px;
             box-shadow: 0 0 12px rgba(38, 37, 49, 0.1);
         }
+
         form {
-            text-align: center;
+            text-align: left;
             margin-bottom: 25px;
         }
-        input[type="file"] {
-            margin: 10px;
+
+        label.section-title {
+            display: block;
+            font-size: 1.1rem;
+            color: #f6f5f9;
+            margin-bottom: 8px;
         }
+
+        .row {
+            display: flex;
+            gap: 20px;            
+            flex-wrap: wrap;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .col {
+            flex: 1 1 240px;
+            min-width: 180px;
+            padding-right: 8px; 
+        }
+
+        input[type="file"] {
+            color: #f6f5f9;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: #1f1f2b;
+            color: #f6f5f9;
+        }
+
         button {
             background-color: #007bff;
             color: white;
@@ -42,17 +79,21 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
+
         button:hover {
             background-color: #0056b3;
         }
+
         hr {
             border: none;
-            border-top: 1px solid #ddd;
-            margin: 30px 0;
+            border-top: 1px solid #3a3a4a;
+            margin: 18px 0;
         }
+
         .plot-section {
             margin-bottom: 40px;
         }
+
         .plot-section h2 {
             text-align: center;
             color: #f4f3fa;
@@ -61,6 +102,7 @@
             padding-bottom: 4px;
             margin-bottom: 20px;
         }
+
         .plot-container {
             width: 100%;
             height: 600px;
@@ -68,26 +110,24 @@
             border-radius: 10px;
             overflow: hidden;
         }
+
         .scatter-container {
             margin-top: 40px;
         }
-        .section-title {
-            font-size: 1.4em;
-            color: #f6f5f9;
-            margin-bottom: 10px;
+
+        .section-sub {
+            color: #cfcfde;
+            margin-bottom: 8px;
         }
-        iframe {
-            width: 100%;
-            height: 550px;
-            border: none;
-        }
+
         footer {
             text-align: center;
-            padding: 15px;
+            padding: 12px;
             background-color: #007bff;
             font-size: 0.9em;
             color: #010002;
             border-top: 1px solid #ddd;
+            position: relative;
         }
 
         #loadingOverlay {
@@ -96,61 +136,98 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(0, 0, 0, 0.6);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 9999;
             flex-direction: column;
+            color: white;
         }
+
         .spinner {
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #007bff;
+            border: 6px solid rgba(255, 255, 255, 0.15);
+            border-top: 6px solid #00bfff;
             border-radius: 50%;
             width: 60px;
             height: 60px;
             animation: spin 1s linear infinite;
+            margin-bottom: 16px;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg)
+            }
+
+            100% {
+                transform: rotate(360deg)
+            }
         }
-        .loading-text {
-            margin-top: 15px;
-            font-size: 1.2em;
-            color: #333;
-        }
-        .inputstyle{
-            color: #f6f5f9;
-        }
-        .footpara{
+
+        .footpara {
             margin: 2px 0;
+            color: #010002;
         }
     </style>
 </head>
+
 <body>
     <header>Traffic Data Visualizer</header>
 
     <div id="loadingOverlay">
         <div class="spinner"></div>
-        <div class="loading-text">Processing your data... please wait</div>
+        <div class="loading-text">Generating plots & CSV — this may take a while. Please wait...</div>
     </div>
 
     <div class="container">
-        <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
-            <label class="section-title" for="file">Upload Traffic Data (.mat, .csv):</label><br>
-            <input class="inputstyle" type="file" name="file" id="file" required>
-            <button type="submit">Upload File</button>
-        </form>
-        
-        <form action="/get_plots" method="POST">
-            <button type="submit">Get Plots</button>
-        </form>
-        
-        <form action="/get_macrodata" method="POST">
-            <button type="submit">Get Macrodata (CSV)</button>
-        </form>
+        <form id="mainForm" action="/generate" method="POST" enctype="multipart/form-data">
+            <label class="section-title" for="file">Upload Traffic Data (.mat, .csv, .xlsx, .xls)</label>
+            <div class="row">
+                <div class="col">
+                    <input type="file" name="file" id="file" required />
+                </div>
+            </div>
 
+            <hr>
+
+            <label class="section-title">Column indices (0-based)</label>
+            <div class="row">
+                <div class="col">
+                    <div class="section-sub">Vehicle ID column</div>
+                    <input type="number" name="col_vehicle" placeholder="e.g. 0" required />
+                </div>
+                <div class="col">
+                    <div class="section-sub">Frame / Time column</div>
+                    <input type="number" name="col_frame" placeholder="e.g. 1" required />
+                </div>
+                <div class="col">
+                    <div class="section-sub">Local Y column</div>
+                    <input type="number" name="col_localy" placeholder="e.g. 3" required />
+                </div>
+            </div>
+
+            <label class="section-title">Grid settings</label>
+            <div class="row">
+                <div class="col">
+                    <div class="section-sub">Frame step (Δframes)</div>
+                    <input type="number" name="frame_step" placeholder="e.g. 600" required />
+                </div>
+                <div class="col">
+                    <div class="section-sub">Y step (Δmeters)</div>
+                    <input type="number" name="y_step" placeholder="e.g. 100" required />
+                </div>
+                <div class="col">
+                    <div class="section-sub">Frame → seconds factor</div>
+                    <input type="text" name="frame_factor" placeholder="e.g. 0.1" required />
+                </div>
+            </div>
+
+            <br />
+            <div style="text-align:center;">
+                <button type="submit">Generate Plots + Download CSV</button>
+            </div>
+        </form>
 
         <hr>
 
@@ -183,35 +260,33 @@
 
         {% if scatter_sections %}
         <div class="scatter-container">
-            <h2 class="section-title">Scatter Plots by Section</h2>
+            <h2 class="section-sub">Scatter Plots by Section</h2>
             {% for section, plots in scatter_sections.items() %}
-                <div class="plot-section">
-                    <div class="section-title">{{ section }}</div>
-                    {% for p in plots %}
-                        <div class="plot-container">
-                            {{ p|safe }}
-                        </div>
-                    {% endfor %}
+            <div class="plot-section">
+                <div class="section-sub">{{ section }}</div>
+                {% for p in plots %}
+                <div class="plot-container">
+                    {{ p|safe }}
                 </div>
+                {% endfor %}
+            </div>
             {% endfor %}
         </div>
         {% endif %}
     </div>
 
     <footer>
-        <p class="footpara">© {{ 2025 }} Built with Flask & Plotly</p class="footpara">
-        <p class="footpara">Github: Sawamura18</p class="footpara">
-        <p class="footpara">Email: utkarsh.excalibur@gmail.com</p class="footpara">
-
+        <p class="footpara">© {{ 2025 }} Built with Flask & Plotly</p>
+        <p class="footpara">Github: Sawamura18</p>
+        <p class="footpara">Email: utkarsh.excalibur@gmail.com</p>
     </footer>
 
     <script>
-        const uploadForm = document.getElementById('uploadForm');
+        // Show loader on form submit
+        const form = document.getElementById('mainForm');
         const overlay = document.getElementById('loadingOverlay');
-
-        uploadForm.addEventListener('submit', function() {
-            overlay.style.display = 'flex';
-        });
+        form.addEventListener('submit', () => overlay.style.display = 'flex');
     </script>
 </body>
+
 </html>
