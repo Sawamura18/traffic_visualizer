@@ -6,10 +6,9 @@ import plotly.io as pio
 import os
 from collections import defaultdict
 
-# --------------- CORE O(n^3) COMPUTATION ---------------
+
 def compute_spatiotemporal_grid(filepath, params):
     """
-    Exact O(n^3) implementation (per original logic).
     Returns DataFrame with columns: StartTime, StartY, AvgSpeed, Density, Flow, Vehicles
     """
     ext = os.path.splitext(filepath)[1].lower()
@@ -24,7 +23,6 @@ def compute_spatiotemporal_grid(filepath, params):
     else:
         raise ValueError("Unsupported file format. Use .mat, .csv, .xlsx, .xls")
 
-    # extract columns
     col_vid = params.get("col_vehicle", 0)
     col_frame = params.get("col_frame", 1)
     col_y = params.get("col_localy", 3)
@@ -33,7 +31,6 @@ def compute_spatiotemporal_grid(filepath, params):
     frame = data[:, col_frame]
     local_y = data[:, col_y]
 
-    # grid params
     frame_step = int(params.get("frame_step", 600))
     y_step = int(params.get("y_step", 100))
     frame_factor = float(params.get("frame_factor", 0.1))
@@ -117,16 +114,12 @@ def compute_spatiotemporal_grid(filepath, params):
 def generate_plots(filepath, params):
     df = compute_spatiotemporal_grid(filepath, params)
 
-    # ---- Clean axis values (fixing drift) ----
     df["StartTime"] = df["StartTime"].round(0).astype(int)
     df["StartY"] = df["StartY"].round(0).astype(int)
 
     os.makedirs("static", exist_ok=True)
     df.to_csv(os.path.join("static", "results_detailed.csv"), index=False)
 
-    # ----------------------------------------------------------
-    # HEATMAP (correct axes)
-    # ----------------------------------------------------------
     def make_rect_heatmap(z_col, title, cbar_title):
         if df.empty:
             return go.Figure()
@@ -136,8 +129,8 @@ def generate_plots(filepath, params):
         fig = go.Figure(
             go.Heatmap(
                 z=pivot.values,
-                x=pivot.columns,    # <-- exact clean times
-                y=pivot.index,      # <-- exact clean Y
+                x=pivot.columns,    
+                y=pivot.index,    
                 colorscale="Plasma",
                 colorbar=dict(title=cbar_title),
                 hovertemplate=(
@@ -156,9 +149,6 @@ def generate_plots(filepath, params):
 
         return fig
 
-    # ----------------------------------------------------------
-    # SCATTER PLOTS (clean section labels)
-    # ----------------------------------------------------------
     def create_section_scatter_plots(df):
         plots_by_section = defaultdict(list)
         y_step = int(params.get("y_step", 100))
@@ -200,9 +190,6 @@ def generate_plots(filepath, params):
 
         return plots_by_section
 
-    # ----------------------------------------------------------
-    # FINAL OUTPUT
-    # ----------------------------------------------------------
     fig_speed   = make_rect_heatmap("AvgSpeed", "Space-Time Heatmap: Avg Speed", "Speed (m/s)")
     fig_flow    = make_rect_heatmap("Flow", "Space-Time Heatmap: Flow", "Flow (veh/h)")
     fig_density = make_rect_heatmap("Density", "Space-Time Heatmap: Density", "Density (veh/km)")
@@ -217,7 +204,6 @@ def generate_plots(filepath, params):
 def generate_macrodata(filepath, params):
     df = compute_spatiotemporal_grid(filepath, params)
 
-    # clean axis labels
     df["StartTime"] = df["StartTime"].round(0).astype(int)
     df["StartY"] = df["StartY"].round(0).astype(int)
 
